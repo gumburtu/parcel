@@ -173,6 +173,7 @@ export class ResolverRunner {
           if (result.filePath != null) {
             return {
               filePath: result.filePath,
+              cachePath: result.cachePath,
               sideEffects: result.sideEffects,
               code: result.code,
               env: dependency.env,
