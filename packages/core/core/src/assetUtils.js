@@ -32,6 +32,7 @@ type AssetOptions = {|
   hash?: ?string,
   idBase?: ?string,
   filePath: FilePath,
+  cachePath?: ?FilePath,
   type: string,
   contentKey?: ?string,
   mapKey?: ?string,
@@ -46,6 +47,7 @@ type AssetOptions = {|
   env: Environment,
   meta?: Meta,
   outputHash?: ?string,
+  contentHash?: ?string,
   pipeline?: ?string,
   stats: Stats,
   symbols?: ?Map<Symbol, {|local: Symbol, loc: ?SourceLocation|}>,
@@ -72,11 +74,15 @@ export function createAsset(options: AssetOptions): Asset {
     committed: options.committed ?? false,
     hash: options.hash,
     filePath: options.filePath,
+    cachePath: options.cachePath,
     isIsolated: options.isIsolated ?? false,
     isInline: options.isInline ?? false,
     isSplittable: options.isSplittable,
     type: options.type,
     contentKey: options.contentKey,
+    hasContent: false,
+    hasMap: false,
+    hasAST: false,
     mapKey: options.mapKey,
     astKey: options.astKey,
     astGenerator: options.astGenerator,
@@ -84,6 +90,7 @@ export function createAsset(options: AssetOptions): Asset {
     includedFiles: options.includedFiles || new Map(),
     isSource: options.isSource,
     outputHash: options.outputHash,
+    contentHash: options.contentHash,
     pipeline: options.pipeline,
     env: options.env,
     meta: options.meta || {},
@@ -143,6 +150,8 @@ async function _generateFromAST(asset: CommittedAsset | UncommittedAsset) {
     mapBuffer != null &&
       asset.options.cache.setBlob(nullthrows(asset.value.mapKey), mapBuffer),
   ]);
+  asset.value.hasContent = true;
+  asset.value.hasMap = true;
 
   return {
     content:
