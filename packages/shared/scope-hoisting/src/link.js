@@ -95,6 +95,8 @@ export function link({
   let importedFiles = new Map<string, ExternalModule | ExternalBundle>();
   let referencedAssets = new Set();
 
+  // return {ast, referencedAssets};
+
   // If building a library, the target is actually another bundler rather
   // than the final output that could be loaded in a browser. So, loader
   // runtimes are excluded, and instead we add imports into the entry bundle

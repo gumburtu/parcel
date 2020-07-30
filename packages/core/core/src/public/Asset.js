@@ -148,6 +148,10 @@ class BaseAsset {
     return this.#asset.value.pipeline;
   }
 
+  get contentHashReference(): string {
+    return this.#asset.value.contentHashReference;
+  }
+
   getConfig(
     filePaths: Array<FilePath>,
     options: ?{|

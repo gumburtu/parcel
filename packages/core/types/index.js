@@ -440,6 +440,7 @@ export interface BaseAsset {
   +fs: FileSystem;
   +filePath: FilePath;
   +id: string;
+  +contentHashReference: string;
   +meta: Meta;
   +isIsolated: boolean;
   /** Whether this asset will/should later be inserted back into the importer. */
