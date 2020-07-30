@@ -148,6 +148,10 @@ class BaseAsset {
     return this.#asset.value.pipeline;
   }
 
+  get contentHash(): ?string {
+    return this.#asset.value.contentHash;
+  }
+
   get contentHashReference(): string {
     return this.#asset.value.contentHashReference;
   }
@@ -214,6 +218,10 @@ export class Asset extends BaseAsset implements IAsset {
     return this;
   }
 
+  get contentHash(): string {
+    return nullthrows(this.#asset.value.contentHash);
+  }
+
   get stats(): Stats {
     return this.#asset.value.stats;
   }
@@ -273,6 +281,10 @@ export class MutableAsset extends BaseAsset implements IMutableAsset {
 
   get symbols(): IMutableSymbols {
     return new MutableAssetSymbols(this.#asset.value);
+  }
+
+  get contentHash(): null {
+    return null;
   }
 
   addDependency(dep: DependencyOptions): string {

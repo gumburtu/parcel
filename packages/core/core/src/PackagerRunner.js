@@ -511,7 +511,7 @@ export default class PackagerRunner {
       outputFS,
       filePath,
       contentStream,
-      true || info.hashReferences.length > 0,
+      info.hashReferences.length > 0,
       hashRefToNameHash,
       writeOptions,
     );
@@ -550,38 +550,30 @@ export default class PackagerRunner {
     let hash = crypto.createHash('md5');
     let boundaryStr = '';
     let hashReferences = [];
+    let stream = blobToStream(contents);
     await this.options.cache.setStream(
       cacheKeys.content,
-      blobToStream(contents)
-        .pipe(
-          new Transform({
-            transform(chunk, encoding, cb) {
-              cb(
-                null,
-                chunk.toString().replace(ASSET_HASH_REF_REGEX, match => {
-                  return (
-                    nullthrows(
-                      bundleGraph.getAssetPublicId(
-                        bundleGraph.getAssetById(getIdFromHashRef(match)),
-                      ),
-                    ) || match
-                  );
-                }),
-              );
-            },
-          }),
-        )
-        .pipe(
-          new TapStream(buf => {
-            let str = boundaryStr + buf.toString();
+      stream.pipe(
+        new Transform({
+          transform(buf, encoding, cb) {
+            let chunk = buf.toString().replace(ASSET_HASH_REF_REGEX, match => {
+              let id = getIdFromHashRef(match);
+              if (bundleGraph.assetExists(id)) {
+                return nullthrows(bundleGraph.getAssetById(id).contentHash);
+              } else return match;
+            });
+
+            let str = boundaryStr + chunk;
             hashReferences = hashReferences.concat(
               str.match(BUNDLE_HASH_REF_REGEX) ?? [],
             );
             size += buf.length;
-            hash.update(buf.toString().replace(ASSET_HASH_REF_REGEX, ''));
+            hash.update(chunk);
             boundaryStr = str.slice(str.length - BOUNDARY_LENGTH);
-          }),
-        ),
+            cb(null, chunk);
+          },
+        }),
+      ),
     );
 
     if (map != null) {

@@ -440,6 +440,7 @@ export interface BaseAsset {
   +fs: FileSystem;
   +filePath: FilePath;
   +id: string;
+  +contentHash: ?string;
   +contentHashReference: string;
   +meta: Meta;
   +isIsolated: boolean;
@@ -501,6 +502,7 @@ export interface MutableAsset extends BaseAsset {
   isInline: boolean;
   isSplittable: ?boolean;
   type: string;
+  +contentHash: null;
 
   addDependency(dep: DependencyOptions): string;
   addIncludedFile(file: File): void;
@@ -525,6 +527,7 @@ export interface MutableAsset extends BaseAsset {
  * @section transformer
  */
 export interface Asset extends BaseAsset {
+  +contentHash: string;
   /** Throws if there is no AST.*/
   getAST(): Promise<?AST>;
 
@@ -880,7 +883,6 @@ export interface Bundle {
  * @section bundler
  */
 export interface NamedBundle extends Bundle {
-  +publicId: string;
   +filePath: FilePath;
   +name: string;
   +displayName: string;
@@ -932,7 +934,6 @@ export interface MutableBundleGraph extends BundleGraph<Bundle> {
  */
 export interface BundleGraph<TBundle: Bundle> {
   getAssetById(id: string): Asset;
-  getAssetPublicId(asset: Asset): string;
   getBundles(): Array<TBundle>;
   getBundleGroupsContainingBundle(bundle: Bundle): Array<BundleGroup>;
   getBundlesInBundleGroup(bundleGroup: BundleGroup): Array<TBundle>;
