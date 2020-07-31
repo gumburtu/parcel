@@ -300,7 +300,11 @@ export default class BundleGraph {
     }
   }
 
-  removeAssetGraphFromBundle(asset: Asset, bundle: Bundle) {
+  removeAssetGraphFromBundle(
+    asset: Asset,
+    bundle: Bundle,
+    options?: ?$Shape<{|checkReachability: boolean|}>,
+  ) {
     // Remove all contains edges from the bundle to the nodes in the asset's
     // subgraph.
     this._graph.traverse((node, context, actions) => {
@@ -310,7 +314,12 @@ export default class BundleGraph {
       }
 
       if (node.type === 'asset' || node.type === 'dependency') {
-        if (this._graph.hasEdge(bundle.id, node.id, 'contains')) {
+        if (
+          this._graph.hasEdge(bundle.id, node.id, 'contains') &&
+          (node.type !== 'asset' ||
+            !options?.checkReachability ||
+            this.isAssetReachableFromBundle(node.value, bundle))
+        ) {
           this._graph.removeEdge(
             bundle.id,
             node.id,
